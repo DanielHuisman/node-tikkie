@@ -15,7 +15,7 @@ export class AccessToken {
     scope: string
 
     constructor(input: AccessTokenInput) {
-        this.tokenType = input.token_type,
+        this.tokenType = input.token_type;
         this.token = input.access_token;
         this.expiresIn = input.expires_in;
         this.expiry = new Date(Date.now() + input.expires_in * 60);

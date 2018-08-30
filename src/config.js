@@ -1,8 +1,9 @@
 // @flow
 
 import fs from 'fs';
-import {URLSearchParams} from 'url';
+import {URLSearchParams, format} from 'url';
 import jwt from 'jsonwebtoken';
+
 
 import {AccessToken} from './accessToken';
 import {TikkieErrorCollection} from './error';
@@ -98,14 +99,17 @@ export class TikkieConfig {
 
             const headers: Headers = this.createHeaders();
             headers.append('Authorization', `Bearer ${token}`);
-            if (data) {
+            if (method === 'POST' && data) {
                 headers.append('Content-Type', 'application/json');
+            }
+            if (method === 'GET' && data) {
+                endpoint += format({query: data});
             }
 
             const response: Response = await fetch(`${this.apiUrl}${endpoint}`, {
                 method,
                 headers,
-                body: data ? JSON.stringify(data) : undefined
+                body: (method === 'POST' && data) ? JSON.stringify(data) : undefined
             });
             const result: Object = await response.json();
 
@@ -119,6 +123,6 @@ export class TikkieConfig {
         }
     }
 
-    getRequest = (endpoint: string): Promise<Object> => this.request('GET', endpoint)
+    getRequest = (endpoint: string, queryParams: object = {}): Promise<Object> => this.request('GET', endpoint, queryParams)
     postRequest = (endpoint: string, data: Object = {}): Promise<Object> => this.request('POST', endpoint, data)
 };
