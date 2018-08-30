@@ -34,8 +34,8 @@ export class TikkieClient {
 
     createPaymentRequest = (platformToken: string, userToken: string, bankAccountToken: string, data: Object) =>
         this.config.postRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/bankaccounts/${bankAccountToken}/paymentrequests`, data)
-    getPaymentRequests = (platformToken: string, userToken: string, queryParams: object) =>
-        this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/paymentrequests`, queryParams)
+    getPaymentRequests = (platformToken: string, userToken: string, query: Object) =>
+        this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/paymentrequests`, query)
     getPaymentRequest = (platformToken: string, userToken: string, paymentRequestToken: string) =>
         this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/paymentrequests/${paymentRequestToken}`)
 };

@@ -102,11 +102,13 @@ export class TikkieConfig {
             if (method === 'POST' && data) {
                 headers.append('Content-Type', 'application/json');
             }
+
+            let queryString = '';
             if (method === 'GET' && data) {
-                endpoint += format({query: data});
+                queryString = format({query: data});
             }
 
-            const response: Response = await fetch(`${this.apiUrl}${endpoint}`, {
+            const response: Response = await fetch(`${this.apiUrl}${endpoint}${queryString}`, {
                 method,
                 headers,
                 body: (method === 'POST' && data) ? JSON.stringify(data) : undefined
@@ -123,6 +125,6 @@ export class TikkieConfig {
         }
     }
 
-    getRequest = (endpoint: string, queryParams: object = {}): Promise<Object> => this.request('GET', endpoint, queryParams)
+    getRequest = (endpoint: string, query: Object = {}): Promise<Object> => this.request('GET', endpoint, query)
     postRequest = (endpoint: string, data: Object = {}): Promise<Object> => this.request('POST', endpoint, data)
 };
