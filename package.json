@@ -16,38 +16,32 @@
     "payment",
     "request"
   ],
-  "main": "lib/index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
   "files": [
     "lib/",
     "LICENSE.md",
     "README.md"
   ],
   "scripts": {
-    "lint": "eslint --color src",
+    "lint": "tslint -p tsconfig.json -c tslint.json",
     "clean": "rimraf lib",
-    "build": "yarn run clean && yarn run lint && yarn run build:babel",
-    "build:babel": "babel src --out-dir lib --source-maps --copy-files",
+    "build": "yarn run clean && yarn run lint && yarn run build:lib",
+    "build:lib": "tsc -p tsconfig.build.json",
     "prepublish": "yarn run build"
   },
   "dependencies": {
-    "babel-runtime": "^6.26.0",
     "isomorphic-fetch": "^2.2.1",
-    "jsonwebtoken": "^8.1.0"
+    "jsonwebtoken": "^8.1.0",
+    "typescript": "^3.3.3"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.0",
-    "babel-eslint": "^8.1.2",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-flow": "^6.23.0",
-    "babel-preset-stage-0": "^6.24.1",
+    "@types/node": "^11.9.5",
+    "ts-node": "^8.0.2",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "5.12.1",
     "cross-env": "^5.1.1",
-    "eslint": "^4.12.1",
-    "eslint-config-google": "^0.9.1",
-    "eslint-plugin-babel": "^4.1.2",
-    "eslint-plugin-flowtype": "^2.41.0",
-    "eslint-plugin-import": "^2.8.0",
+    "rimraf": "^2.6.3",
     "flow-bin": "^0.63.1"
   }
 }

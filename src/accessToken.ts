@@ -1,18 +1,16 @@
-// @flow
-
-type AccessTokenInput = {
-    token_type: string,
-    access_token: string,
-    expires_in: number,
-    scope: string
-};
+interface AccessTokenInput {
+    token_type: string;
+    access_token: string;
+    expires_in: number;
+    scope: string;
+}
 
 export class AccessToken {
-    tokenType: string
-    token: string
-    expiresIn: number
-    expiry: Date
-    scope: string
+    private tokenType: string;
+    public token: string;
+    private expiresIn: number;
+    private readonly expiry: Date;
+    private scope: string;
 
     constructor(input: AccessTokenInput) {
         this.tokenType = input.token_type;
@@ -25,4 +23,4 @@ export class AccessToken {
     hasExpired() {
         return new Date() >= this.expiry;
     }
-};
+}
