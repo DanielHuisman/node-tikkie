@@ -1,9 +1,6 @@
-// @flow
-
-import fs from 'fs';
+import * as fs from 'fs';
 import {URLSearchParams, format} from 'url';
 import jwt from 'jsonwebtoken';
-
 
 import {AccessToken} from './accessToken';
 import {TikkieErrorCollection} from './error';
@@ -14,13 +11,13 @@ const SANDBOX_API_URL = 'https://api-sandbox.abnamro.com';
 const SANDBOX_TOKEN_AUDIENCE = 'https://auth-sandbox.abnamro.com/oauth/token';
 
 export class TikkieConfig {
-    _accessToken: AccessToken
-    apiKey: string
-    useSandbox: boolean
-    apiUrl: string
-    tokenAudience: string
-    privateKey: string
-    algorithm: string
+    accessToken: AccessToken;
+    apiKey: string;
+    useSandbox: boolean;
+    apiUrl: string;
+    tokenAudience: string;
+    privateKey: string;
+    algorithm: string;
 
     constructor(apiKey: string, useSandbox: boolean = false) {
         this.apiKey = apiKey;
@@ -52,14 +49,14 @@ export class TikkieConfig {
             notBefore: '-1m',
             issuer: 'node-tikkie',
             subject: this.apiKey,
-            audience: this.tokenAudience
+            audience: this.tokenAudience,
         });
     }
 
     getAccessToken = async (): Promise<string> => {
-        if (!this._accessToken || this._accessToken.hasExpired()) {
+        if (!this.accessToken || this.accessToken.hasExpired()) {
             try {
-                const body: Object = new URLSearchParams();
+                const body = new URLSearchParams();
                 body.append('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
                 body.append('client_assertion', this.getJsonWebToken());
                 body.append('grant_type', 'client_credentials');
@@ -71,13 +68,13 @@ export class TikkieConfig {
                 const response: Response = await fetch(`${this.apiUrl}/v1/oauth/token`, {
                     method: 'POST',
                     headers,
-                    body
+                    body,
                 });
 
-                const result: Object = await response.json();
+                const result = await response.json();
 
                 if (response.status >= 200 && response.status <= 399) {
-                    this._accessToken = new AccessToken(result);
+                    this.accessToken = new AccessToken(result);
                 } else {
                     throw new TikkieErrorCollection(result.errors);
                 }
@@ -85,10 +82,10 @@ export class TikkieConfig {
                 throw err;
             }
         }
-        return this._accessToken.token;
+        return this.accessToken.token;
     }
 
-    request = async (method: 'GET' | 'POST', endpoint: string, data: Object | null = null): Promise<Object> => {
+    request = async (method: 'GET' | 'POST', endpoint: string, data: object | null = null): Promise<object> => {
         try {
             let token: string;
             try {
@@ -111,9 +108,9 @@ export class TikkieConfig {
             const response: Response = await fetch(`${this.apiUrl}${endpoint}${queryString}`, {
                 method,
                 headers,
-                body: (method === 'POST' && data) ? JSON.stringify(data) : undefined
+                body: (method === 'POST' && data) ? JSON.stringify(data) : undefined,
             });
-            const result: Object = await response.json();
+            const result = await response.json();
 
             if (response.status >= 200 && response.status <= 399) {
                 return result;
@@ -125,6 +122,6 @@ export class TikkieConfig {
         }
     }
 
-    getRequest = (endpoint: string, query: Object = {}): Promise<Object> => this.request('GET', endpoint, query)
-    postRequest = (endpoint: string, data: Object = {}): Promise<Object> => this.request('POST', endpoint, data)
-};
+    getRequest = (endpoint: string, query: object = {}): Promise<object> => this.request('GET', endpoint, query);
+    postRequest = (endpoint: string, data: object = {}): Promise<object> => this.request('POST', endpoint, data);
+}

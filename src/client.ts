@@ -1,9 +1,7 @@
-// @flow
-
 import {TikkieConfig} from './config';
 
 export class TikkieClient {
-    config: TikkieConfig
+    config: TikkieConfig;
 
     /**
      * Initialize TikkieClient.
@@ -18,7 +16,7 @@ export class TikkieClient {
      * Manually authenticate with the Tikkie API.
      * TikkieClient will automatically connect before making the first request.
      */
-    authenticate = async (): Promise<void> => {
+    async authenticate() {
         try {
             await this.config.getAccessToken();
         } catch (err) {
@@ -26,16 +24,16 @@ export class TikkieClient {
         }
     }
 
-    createPlatform = (data: Object) => this.config.postRequest('/v1/tikkie/platforms', data)
-    getPlatforms = () => this.config.getRequest('/v1/tikkie/platforms')
+    createPlatform = (data: object) => this.config.postRequest('/v1/tikkie/platforms', data);
+    getPlatforms = () => this.config.getRequest('/v1/tikkie/platforms');
 
-    createUser = (platformToken: string, data: Object) => this.config.postRequest(`/v1/tikkie/platforms/${platformToken}/users`, data)
-    getUsers = (platformToken: string) => this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users`)
+    createUser = (platformToken: string, data: object) => this.config.postRequest(`/v1/tikkie/platforms/${platformToken}/users`, data);
+    getUsers = (platformToken: string) => this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users`);
 
-    createPaymentRequest = (platformToken: string, userToken: string, bankAccountToken: string, data: Object) =>
+    createPaymentRequest = (platformToken: string, userToken: string, bankAccountToken: string, data: object) =>
         this.config.postRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/bankaccounts/${bankAccountToken}/paymentrequests`, data)
-    getPaymentRequests = (platformToken: string, userToken: string, query: Object) =>
+    getPaymentRequests = (platformToken: string, userToken: string, query: object) =>
         this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/paymentrequests`, query)
     getPaymentRequest = (platformToken: string, userToken: string, paymentRequestToken: string) =>
         this.config.getRequest(`/v1/tikkie/platforms/${platformToken}/users/${userToken}/paymentrequests/${paymentRequestToken}`)
-};
+}
