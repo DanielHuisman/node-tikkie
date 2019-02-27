@@ -1,7 +1,7 @@
 {
   "name": "tikkie",
   "description": "JavaScript implementation of the Tikkie API.",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "license": "MIT",
   "author": "Daniel Huisman <daniel@huisman.me> (https://danielhuisman.io)",
   "repository": "github:DanielHuisman/node-tikkie",
@@ -37,11 +37,11 @@
   },
   "devDependencies": {
     "@types/node": "^11.9.5",
+    "cross-env": "^5.1.1",
+    "flow-bin": "^0.63.1",
+    "rimraf": "^2.6.3",
     "ts-node": "^8.0.2",
     "tsconfig-paths": "^3.8.0",
-    "tslint": "5.12.1",
-    "cross-env": "^5.1.1",
-    "rimraf": "^2.6.3",
-    "flow-bin": "^0.63.1"
+    "tslint": "5.12.1"
   }
 }
