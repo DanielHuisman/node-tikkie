@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import {URLSearchParams, format} from 'url';
-import jwt from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 
 import {AccessToken} from './accessToken';
 import {TikkieErrorCollection} from './error';
