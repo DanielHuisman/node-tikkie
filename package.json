@@ -1,7 +1,7 @@
 {
   "name": "tikkie",
   "description": "JavaScript implementation of the Tikkie API.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "MIT",
   "author": "Daniel Huisman <daniel@huisman.me> (https://danielhuisman.io)",
   "repository": "github:DanielHuisman/node-tikkie",
