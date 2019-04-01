@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import {URLSearchParams, format} from 'url';
 import * as jwt from 'jsonwebtoken';
+import * as util from 'util';
 
 import {AccessToken} from './accessToken';
 import {TikkieErrorCollection} from './error';
@@ -27,8 +28,15 @@ export class TikkieConfig {
         this.tokenAudience = useSandbox ? SANDBOX_TOKEN_AUDIENCE : PRODUCTION_TOKEN_AUDIENCE;
     }
 
-    loadPrivateKey(path: string, algorithm: string = 'RS256') {
-        this.loadPrivateKeyFromString(fs.readFileSync(path, 'utf8'), algorithm);
+    async loadPrivateKey(path: string, algorithm: string = 'RS256') : Promise<void> {
+        // Make the readFile function return a promise.
+        const readFile = util.promisify(fs.readFile);
+
+        // Await the content.
+        let content : string = await readFile(path, 'utf8');
+
+        // Load the private key from the content.
+        this.loadPrivateKeyFromString(content, algorithm);
     }
 
     loadPrivateKeyFromString(privateKey: string, algorithm: string = 'RS256') {
