@@ -62,4 +62,5 @@ import {TikkieClient, TikkieConfig, PLATFORM_USAGE_MYSELF} from 'tikkie';
 ```
 
 ## Other languages
-- [PHPTikkie by Jarno van Leeuwen](https://github.com/jarnovanleeuwen/php-tikkie)
+- [PHPTikkie](https://github.com/jarnovanleeuwen/php-tikkie) by Jarno van Leeuwen in PHP.
+- [tikkie-api](https://github.com/KentaaNL/tikkie-api) by KentaaNL in Ruby.

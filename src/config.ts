@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import {URLSearchParams, format} from 'url';
 import * as jwt from 'jsonwebtoken';
+import * as util from 'util';
 
 import {AccessToken} from './accessToken';
 import {TikkieErrorCollection} from './error';
@@ -11,6 +12,7 @@ const SANDBOX_API_URL = 'https://api-sandbox.abnamro.com';
 const SANDBOX_TOKEN_AUDIENCE = 'https://auth-sandbox.abnamro.com/oauth/token';
 
 export class TikkieConfig {
+
     accessToken: AccessToken;
     apiKey: string;
     useSandbox: boolean;
@@ -26,8 +28,15 @@ export class TikkieConfig {
         this.tokenAudience = useSandbox ? SANDBOX_TOKEN_AUDIENCE : PRODUCTION_TOKEN_AUDIENCE;
     }
 
-    loadPrivateKey(path: string, algorithm: string = 'RS256') {
-        this.loadPrivateKeyFromString(fs.readFileSync(path, 'utf8'), algorithm);
+    async loadPrivateKey(path: string, algorithm: string = 'RS256') : Promise<void> {
+        // Make the readFile function return a promise.
+        const readFile = util.promisify(fs.readFile);
+
+        // Await the content.
+        let content : string = await readFile(path, 'utf8');
+
+        // Load the private key from the content.
+        this.loadPrivateKeyFromString(content, algorithm);
     }
 
     loadPrivateKeyFromString(privateKey: string, algorithm: string = 'RS256') {
@@ -35,7 +44,10 @@ export class TikkieConfig {
         this.algorithm = algorithm;
     }
 
-    createHeaders(): Headers {
+    /**
+     * Create headers which we can use for each request.
+     */
+    createStandardHeaders(): Headers {
         const headers: Headers = new Headers();
         headers.append('User-Agent', 'node-tikkie/1.0');
         headers.append('API-Key', this.apiKey);
@@ -53,37 +65,49 @@ export class TikkieConfig {
         });
     }
 
-    getAccessToken = async (): Promise<string> => {
-        if (!this.accessToken || this.accessToken.hasExpired()) {
-            try {
-                const body = new URLSearchParams();
-                body.append('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
-                body.append('client_assertion', this.getJsonWebToken());
-                body.append('grant_type', 'client_credentials');
-                body.append('scope', 'tikkie');
+    refreshAccessToken = async (): Promise<AccessToken> =>  {
+        try {
+            const body = this.getAccessTokenRequestBody();
 
-                const headers: Headers = this.createHeaders();
-                headers.append('Content-Type', 'application/x-www-form-urlencoded');
+            const headers: Headers = this.createStandardHeaders();
+            headers.append('Content-Type', 'application/x-www-form-urlencoded');
 
-                const response: Response = await fetch(`${this.apiUrl}/v1/oauth/token`, {
-                    method: 'POST',
-                    headers,
-                    body,
-                });
+            const response: Response = await fetch(`${this.apiUrl}/v1/oauth/token`, {
+                method: 'POST',
+                headers,
+                body,
+            });
 
-                const result = await response.json();
+            const result = await response.json();
 
-                if (response.status >= 200 && response.status <= 399) {
-                    this.accessToken = new AccessToken(result);
-                } else {
-                    throw new TikkieErrorCollection(result.errors);
-                }
-            } catch (err) {
-                throw err;
+            if (response.status >= 200 && response.status <= 399) {
+                return new AccessToken(result);
+            } else {
+                throw new TikkieErrorCollection(result.errors);
             }
+        } catch (err) {
+            throw err;
+        }
+    }
+
+    getAccessTokenRequestBody() : URLSearchParams {
+        const body = new URLSearchParams();
+        body.append('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
+        body.append('client_assertion', this.getJsonWebToken());
+        body.append('grant_type', 'client_credentials');
+        body.append('scope', 'tikkie');
+        return body;
+    }
+
+    getAccessToken = async (): Promise<string> => {
+        // Check if the access token is valid.
+        if (!this.isAccessTokenValid) {
+            this.accessToken = await this.refreshAccessToken();
         }
         return this.accessToken.token;
     }
+
+    isAccessTokenValid = () : Boolean => (!this.accessToken || this.accessToken.hasExpired());
 
     request = async (method: 'GET' | 'POST', endpoint: string, data: object | null = null): Promise<object> => {
         try {
@@ -94,7 +118,7 @@ export class TikkieConfig {
                 throw err;
             }
 
-            const headers: Headers = this.createHeaders();
+            const headers: Headers = this.createStandardHeaders();
             headers.append('Authorization', `Bearer ${token}`);
             if (method === 'POST' && data) {
                 headers.append('Content-Type', 'application/json');
@@ -108,7 +132,7 @@ export class TikkieConfig {
             const response: Response = await fetch(`${this.apiUrl}${endpoint}${queryString}`, {
                 method,
                 headers,
-                body: (method === 'POST' && data) ? JSON.stringify(data) : undefined,
+                body: (method === 'POST' && data) ? JSON.stringify(data) : undefined
             });
             const result = await response.json();
 
