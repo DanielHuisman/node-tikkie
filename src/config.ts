@@ -57,16 +57,6 @@ export class TikkieConfig {
         });
     }
 
-
-    getAccessTokenRequestBody() : URLSearchParams {
-        const body = new URLSearchParams();
-        body.append('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
-        body.append('client_assertion', this.getJsonWebToken());
-        body.append('grant_type', 'client_credentials');
-        body.append('scope', 'tikkie');
-        return body;
-    }
-
     refreshAccessToken = async (): Promise<AccessToken> =>  {
         try {
             const body = this.getAccessTokenRequestBody();
@@ -92,6 +82,15 @@ export class TikkieConfig {
         }
     }
 
+    getAccessTokenRequestBody() : URLSearchParams {
+        const body = new URLSearchParams();
+        body.append('client_assertion_type', 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer');
+        body.append('client_assertion', this.getJsonWebToken());
+        body.append('grant_type', 'client_credentials');
+        body.append('scope', 'tikkie');
+        return body;
+    }
+
     getAccessToken = async (): Promise<string> => {
         // Check if the access token is valid.
         if (!this.isAccessTokenValid) {
@@ -100,7 +99,7 @@ export class TikkieConfig {
         return this.accessToken.token;
     }
 
-    isAccessTokenValid= () : Boolean => (!this.accessToken || this.accessToken.hasExpired());
+    isAccessTokenValid = () : Boolean => (!this.accessToken || this.accessToken.hasExpired());
 
     request = async (method: 'GET' | 'POST', endpoint: string, data: object | null = null): Promise<object> => {
         try {
